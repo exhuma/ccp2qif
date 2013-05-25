@@ -57,9 +57,14 @@ class UnicodeReader:
         return self
 
 
-def convert(source_filename, target_filename):
+def convert(source_filename, target_filename, account_name=None):
     with open(source_filename, 'r') as csvfile:
         with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
+            if account_name:
+                outfile.write('!Account\n')
+                outfile.write('N{0}\n'.format(account_name))
+                outfile.write('TBank\n')
+                outfile.write('^\n')
             outfile.write(u'!Type:Bank\n')
             acc_info = csvfile.readline()
             header = csvfile.readline()
@@ -78,6 +83,9 @@ def climain():
     parser = OptionParser(usage="%prog [options] --infile <infile> --outfile <outfile>")
     parser.add_option('-i', '--infile', dest='infile',
                       help='The input file (csv)')
+    parser.add_option('-n', '--account-name', dest='account_name',
+                      help='The name of the account for this import',
+                      default=None)
     parser.add_option('-o', '--outfile', dest='outfile',
                       help='The output file (qif)')
     (options, args) = parser.parse_args()
@@ -91,7 +99,8 @@ def climain():
         return 9
 
     convert(options.infile,
-            options.outfile)
+            options.outfile,
+            account_name=options.account_name)
 
 
 
