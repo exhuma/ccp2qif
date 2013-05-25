@@ -1,6 +1,8 @@
+from __future__ import print_function
 import csv
 from collections import namedtuple
 import codecs
+import sys
 
 DataRow = namedtuple('DataRow',
     'accounting_date, '
@@ -66,9 +68,32 @@ def convert(source_filename, target_filename):
             for row in csvreader:
                 record = DataRow(*row)
                 outfile.write(to_qif(record._asdict()))
-                print u'Wrote {0.accounting_date} - {0.communication_1}'.format(
-                        record).encode('utf8')
+                print(u'Wrote {0.accounting_date} - {0.communication_1}'.format(
+                    record).encode('utf8'))
+
+
+
+def climain():
+    from optparse import OptionParser
+    parser = OptionParser(usage="%prog [options] --infile <infile> --outfile <outfile>")
+    parser.add_option('-i', '--infile', dest='infile',
+                      help='The input file (csv)')
+    parser.add_option('-o', '--outfile', dest='outfile',
+                      help='The output file (qif)')
+    (options, args) = parser.parse_args()
+
+    if not options.infile:
+        parser.print_usage(sys.stderr)
+        return 9
+
+    if not options.outfile:
+        parser.print_usage(sys.stderr)
+        return 9
+
+    convert(options.infile,
+            options.outfile)
+
 
 
 if __name__ == "__main__":
-    convert('input.csv', 'out.qif')
+    climain()
