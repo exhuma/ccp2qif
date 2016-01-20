@@ -1,9 +1,19 @@
 from __future__ import print_function
-import csv
-from collections import namedtuple
+import xlrd
 import codecs
+from collections import namedtuple
 import sys
 from os.path import splitext
+from datetime import datetime
+
+CCardRow = namedtuple('CCardRow',
+    'accounting_date, '
+    'operation_date, '
+    'card_number, '
+    'description, '
+    'original_amount, '
+    'amount'
+)
 
 DataRow = namedtuple('DataRow',
     'accounting_date, '
@@ -14,61 +24,45 @@ DataRow = namedtuple('DataRow',
 )
 
 def to_qif(record):
-    return u"""D{accounting_date}
-T{amount}
-P{counterparty_name} ({counterparty_account})
+    return u"""D{0.accounting_date}
+T{0.amount}
+P{0.description}
 ^
-""".format(**record)
+""".format(record)
 
 
-class UTF8Recoder:
-    """
-    Iterator that reads an encoded stream and reencodes the input to UTF-8
-    """
-    def __init__(self, f, encoding):
-        self.reader = codecs.getreader(encoding)(f)
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        return self.reader.next().encode("utf-8")
-
-class UnicodeReader:
-    """
-    A CSV reader which will iterate over lines in the CSV file "f",
-    which is encoded in the given encoding.
-    """
-
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        f = UTF8Recoder(f, encoding)
-        self.reader = csv.reader(f, dialect=dialect, **kwds)
-
-    def next(self):
-        row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
-
-    def __iter__(self):
-        return self
+def date_converter(book):
+    def fun(date):
+        date_tuple = xlrd.xldate_as_tuple(date.value, book.datemode)
+        return datetime(*date_tuple)
+    return fun
 
 
 def convert(source_filename, target_filename, account_name=None):
-    with open(source_filename, 'r') as csvfile:
-        with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
-            if account_name:
-                outfile.write('!Account\n')
-                outfile.write('N{0}\n'.format(account_name))
-                outfile.write('TBank\n')
-                outfile.write('^\n')
-            outfile.write(u'!Type:Bank\n')
-            acc_info = csvfile.readline()
-            header = csvfile.readline()
-            csvreader = UnicodeReader(csvfile, delimiter=',', quotechar='"',
-                encoding='utf8')
-            for row in csvreader:
-                record = DataRow(*row)
-                outfile.write(to_qif(record._asdict()))
+    workbook = xlrd.open_workbook(source_filename)
+    convert_date = date_converter(workbook)
+    sheet = workbook.sheet_by_index(0)
+    with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
+        if account_name:
+            outfile.write('!Account\n')
+            outfile.write('N{0}\n'.format(account_name))
+            outfile.write('TBank\n')
+            outfile.write('^\n')
+        outfile.write(u'!Type:Bank\n')
 
+        for ridx in range(sheet.nrows):
+            if ridx == 0:
+                continue  # Skip header
+            xlrow = sheet.row(ridx)
+            row = CCardRow(
+                convert_date(xlrow[0]),
+                convert_date(xlrow[1]),
+                xlrow[2].value,
+                xlrow[3].value,
+                xlrow[4].value,
+                xlrow[5].value,
+            )
+            outfile.write(to_qif(row))
 
 
 def climain():
@@ -98,11 +92,9 @@ def climain():
             return 9
         outfile = '{0}.qif'.format(base)
 
-
     convert(infile,
             outfile,
             account_name=options.account_name)
-
 
 
 if __name__ == "__main__":
