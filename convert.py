@@ -8,20 +8,14 @@ from os.path import splitext
 DataRow = namedtuple('DataRow',
     'accounting_date, '
     'description, '
-    'amount, '
-    'currency, '
-    'value_date, '
     'counterparty_account, '
     'counterparty_name, '
-    'communication_1, '
-    'communication_2, '
-    'operation_reference')
+    'amount'
+)
 
 def to_qif(record):
     return u"""D{accounting_date}
 T{amount}
-N{operation_reference}
-M{communication_1} {communication_2}
 P{counterparty_name} ({counterparty_account})
 ^
 """.format(**record)
@@ -69,13 +63,11 @@ def convert(source_filename, target_filename, account_name=None):
             outfile.write(u'!Type:Bank\n')
             acc_info = csvfile.readline()
             header = csvfile.readline()
-            csvreader = UnicodeReader(csvfile, delimiter=';', quotechar='"',
-                encoding='latin1')
+            csvreader = UnicodeReader(csvfile, delimiter=',', quotechar='"',
+                encoding='utf8')
             for row in csvreader:
                 record = DataRow(*row)
                 outfile.write(to_qif(record._asdict()))
-                print(u'Wrote {0.accounting_date} - {0.communication_1}'.format(
-                    record).encode('utf8'))
 
 
 
