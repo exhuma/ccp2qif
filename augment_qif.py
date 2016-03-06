@@ -53,7 +53,7 @@ def process(filename, hints):
 
         account_hints = set(hints.setdefault(account_number, []))
         account_hints.add(basename(filename))
-        hints[account_number] = list(account_number)
+        hints[account_number] = list(account_hints)
         move(filename, filename + '.bak')
         with open(filename, 'w') as outfile:
             outfile.write(u'!Account\n')
