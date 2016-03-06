@@ -24,6 +24,7 @@ from json import load, dump
 
 def process(filename, hints):
 
+    print('Processing %s' % filename)
     with open(filename) as fp:
         data = fp.read()
 
@@ -70,8 +71,9 @@ def main():
         hints = load(open('hints.json'))
     else:
         hints = {}
-    process(sys.argv[1], hints)
-    dump(hints, open('hints.json', 'w'), indent=4)
+    for filename in sys.argv[1:]:
+        process(filename, hints)
+        dump(hints, open('hints.json', 'w'), indent=4)
 
 
 if __name__ == '__main__':
