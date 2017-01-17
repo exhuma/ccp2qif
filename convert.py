@@ -6,7 +6,8 @@ from os.path import splitext
 
 from ccp2qif.util import UnicodeReader
 
-DataRow = namedtuple('DataRow',
+DataRow = namedtuple(
+    'DataRow',
     'accounting_date, '
     'description, '
     'amount, '
@@ -17,6 +18,7 @@ DataRow = namedtuple('DataRow',
     'communication_1, '
     'communication_2, '
     'operation_reference')
+
 
 def to_qif(record):
     return u"""D{accounting_date}
@@ -52,7 +54,7 @@ def convert(source_filename, target_filename, account_name=None):
             acc_info = csvfile.readline()
             header = csvfile.readline()
             csvreader = UnicodeReader(csvfile, delimiter=';', quotechar='"',
-                encoding='latin1')
+                                      encoding='latin1')
             for row in csvreader:
                 record = DataRow(*row)
                 outfile.write(to_qif(record._asdict()))
@@ -86,7 +88,6 @@ def climain():
                   file=sys.stderr)
             return 9
         outfile = '{0}.qif'.format(base)
-
 
     convert(infile,
             outfile,

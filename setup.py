@@ -14,6 +14,11 @@ setup(
         'schwifty',
     ],
     packages=find_packages(),
+    entry_points={
+        'console_scripts': {
+            'ccp2qif=ccp2qif.cli.main'
+        }
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
