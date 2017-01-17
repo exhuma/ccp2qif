@@ -30,20 +30,30 @@ P{counterparty_name} ({counterparty_account})
 """.format(**record)
 
 
-def convert(source_filename, target_filename, account_name=None):
-    with open(source_filename, 'r') as csvfile:
-        # if the filename is a valid IBAN number, we take this as account number
-        base_name, _, _ = source_filename.rpartition('.')
-        from schwifty import IBAN
-        try:
-            iban = IBAN(base_name)
-        except ValueError:
-            # not a valid IBAN number. We can ignore this.
-            pass
-        else:
-            account_name = iban.compact
-            print('Using %s as accound number (from filename): ' % account_name)
+def account_name_from_filename(filename):
+    from schwifty import IBAN
+    # if the filename is a valid IBAN number, we take this as account number
+    base_name, _, _ = filename.rpartition('.')
+    try:
+        iban = IBAN(base_name)
+    except ValueError:
+        # not a valid IBAN number. We can ignore this.
+        return None
+    else:
+        return iban.compact
 
+
+def convert(source_filename, target_filename, account_name=None):
+    detected_account_name = account_name_from_filename(source_filename)
+    if not account_name and detected_account_name:
+        print('Using %s as accound number (from filename): ' %
+              detected_account_name)
+        account_name = detected_account_name
+    elif account_name:
+        print('Using %s as accound number (from CLI argument): ' %
+              account_name)
+
+    with open(source_filename, 'r') as csvfile:
         with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
             if account_name:
                 outfile.write('!Account\n')
