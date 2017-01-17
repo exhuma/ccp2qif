@@ -20,14 +20,26 @@ DataRow = namedtuple(
     'operation_reference')
 
 
+def clean_join(record, fields):
+    """
+    Join only fields which have a value
+    """
+    return '; '.join([record[_] for _ in fields if record[_].strip()])
+
+
 def to_qif(record):
+    message = clean_join(record,
+                         ('communication_1', 'communication_2', 'description'))
+    counterparty = clean_join(record,
+                              ('counterparty_name', 'counterparty_account'))
+
     return u"""D{accounting_date}
 T{amount}
 N{operation_reference}
-M{communication_1} {communication_2}
-P{counterparty_name} ({counterparty_account})
+M{message_}
+P{counterparty_}
 ^
-""".format(**record)
+""".format(message_=message, counterparty_=counterparty, **record)
 
 
 def account_name_from_filename(filename):
