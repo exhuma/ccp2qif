@@ -12,6 +12,7 @@ setup(
     license='MIT',
     install_requires=[
         'schwifty',
+        'xlrd',
     ],
     packages=find_packages(),
     entry_points={

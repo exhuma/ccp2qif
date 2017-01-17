@@ -34,14 +34,22 @@ def to_qif(record):
                          ('communication_1', 'communication_2', 'description'))
     counterparty = clean_join(record,
                               ('counterparty_name', 'counterparty_account'))
+    lines = []
+    lines.append(u'D{value_date}')
+    lines.append(u'T{amount}')
+    if record['operation_reference']:
+        lines.append(u'N{operation_reference}')
+    lines.append(u'M{message_}')
+    if counterparty:
+        lines.append(u'P{counterparty_}')
+    lines.append(u'^')
 
-    return u"""D{accounting_date}
-T{amount}
-N{operation_reference}
-M{message_}
-P{counterparty_}
-^
-""".format(message_=message, counterparty_=counterparty, **record)
+    outlines = []
+    for line in lines:
+        outlines.append(line.format(
+            message_=message, counterparty_=counterparty, **record))
+    return '\n'.join(outlines)
+
 
 
 def account_name_from_filename(filename):
@@ -70,7 +78,7 @@ def try_getting_account_number(line):
         return None
 
 
-def convert(source_filename, target_filename, account_name=None):
+def convert_csv(source_filename, target_filename, account_name=None):
     detected_account_name = account_name_from_filename(source_filename)
     if not account_name and detected_account_name:
         print('Using %s as account number (from filename): ' %
@@ -109,6 +117,53 @@ def convert(source_filename, target_filename, account_name=None):
                 outfile.write(to_qif(record._asdict()))
                 print(u'Wrote {0.accounting_date} - {0.communication_1}'.format(
                     record).encode('utf8'))
+
+
+def convert_excel(source_filename, target_filename, account_name):
+    from xlrd import open_workbook, xldate_as_tuple
+    from datetime import date
+    if not account_name:
+        raise ValueError('Account name is required for Excel exports!')
+    book = open_workbook(source_filename)
+    sheet = book.sheet_by_index(0)
+    with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
+        outfile.write('!Account\n')
+        outfile.write('N{0}\n'.format(account_name))
+        outfile.write('TBank\n')
+        outfile.write('^\n')
+        outfile.write(u'!Type:Bank\n')
+        for row_index in range(1, sheet.nrows):
+            line = [sheet.cell(row_index, col_index).value
+                    for col_index in range(sheet.ncols)]
+            acdate_value, opdate_value, card_number, description, _, amount = line
+            opdate_value = date(*xldate_as_tuple(opdate_value, book.datemode)[:3])
+            acdate_value = date(*xldate_as_tuple(acdate_value, book.datemode)[:3])
+            record = DataRow(
+                acdate_value,
+                description,
+                amount,
+                'EUR',
+                opdate_value,
+                'unspecified',
+                '',
+                '',
+                '',
+                '',
+            )
+            outfile.write(to_qif(record._asdict()))
+            print(u'Wrote {0.value_date} - {0.description}'.format(
+                record).encode('utf8'))
+
+
+def convert(source_filename, target_filename, account_name=None):
+    _, _, extension = source_filename.lower().rpartition('.')
+    if extension == 'xls':
+        func = convert_excel
+    elif extension == 'csv':
+        func = convert_csv
+    else:
+        raise ValueError('Unsupported file format: %r' % extension)
+    func(source_filename, target_filename, account_name)
 
 
 def climain():
