@@ -60,6 +60,18 @@ class UnicodeReader:
 
 def convert(source_filename, target_filename, account_name=None):
     with open(source_filename, 'r') as csvfile:
+        # if the filename is a valid IBAN number, we take this as account number
+        base_name, _, _ = source_filename.rpartition('.')
+        from schwifty import IBAN
+        try:
+            iban = IBAN(base_name)
+        except ValueError:
+            # not a valid IBAN number. We can ignore this.
+            pass
+        else:
+            account_name = iban.compact
+            print('Using %s as accound number (from filename): ' % account_name)
+
         with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
             if account_name:
                 outfile.write('!Account\n')
