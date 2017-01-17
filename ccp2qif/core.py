@@ -92,7 +92,3 @@ def climain():
     convert(infile,
             outfile,
             account_name=options.account_name)
-
-
-if __name__ == "__main__":
-    climain()
