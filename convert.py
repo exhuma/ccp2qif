@@ -1,9 +1,10 @@
 from __future__ import print_function
-import csv
 from collections import namedtuple
 import codecs
 import sys
 from os.path import splitext
+
+from ccp2qif.util import UnicodeReader
 
 DataRow = namedtuple('DataRow',
     'accounting_date, '
@@ -25,37 +26,6 @@ M{communication_1} {communication_2}
 P{counterparty_name} ({counterparty_account})
 ^
 """.format(**record)
-
-
-class UTF8Recoder:
-    """
-    Iterator that reads an encoded stream and reencodes the input to UTF-8
-    """
-    def __init__(self, f, encoding):
-        self.reader = codecs.getreader(encoding)(f)
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        return self.reader.next().encode("utf-8")
-
-class UnicodeReader:
-    """
-    A CSV reader which will iterate over lines in the CSV file "f",
-    which is encoded in the given encoding.
-    """
-
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        f = UTF8Recoder(f, encoding)
-        self.reader = csv.reader(f, dialect=dialect, **kwds)
-
-    def next(self):
-        row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
-
-    def __iter__(self):
-        return self
 
 
 def convert(source_filename, target_filename, account_name=None):
@@ -90,7 +60,6 @@ def convert(source_filename, target_filename, account_name=None):
                     record).encode('utf8'))
 
 
-
 def climain():
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] <infile>")
@@ -122,7 +91,6 @@ def climain():
     convert(infile,
             outfile,
             account_name=options.account_name)
-
 
 
 if __name__ == "__main__":
