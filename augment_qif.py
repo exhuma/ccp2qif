@@ -75,12 +75,14 @@ def process(filename, hints):
 def main(folder):
     hints_file = join(folder, 'hints.json')
     if exists(hints_file):
-        hints = load(open(hints_file))
+        with open(hints_file) as fp:
+            hints = load(fp)
     else:
         hints = {}
     for filename in glob(join(folder, '*.qif')):
         process(filename, hints)
-        dump(hints, open(hints_file, 'w'), indent=4)
+        with open(hints_file, 'w') as fp:
+            dump(hints, fp, indent=4)
 
 
 if __name__ == '__main__':
