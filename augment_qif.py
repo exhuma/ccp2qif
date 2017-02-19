@@ -70,6 +70,8 @@ def process(filename, hints):
 
             # Copy the remaining data
             outfile.write(data)
+    else:
+        print('%s already contains an account identfidier' % filename)
 
 
 def main(folder):
