@@ -14,12 +14,18 @@ If the filename contains any one of the hints, the matching account number is
 used.
 
 If the file does not exist, it's automatically created.
+
+The QIF files and hints file must be in the same folder. All QIF files in that
+folder will be processed. The original file will be written as a '.bak' file.
 """
 
-import sys
-from os.path import exists, basename
-from shutil import move
+from glob import glob
 from json import load, dump
+from os.path import exists, basename, join
+from shutil import move
+import sys
+
+
 
 
 def process(filename, hints):
@@ -66,14 +72,15 @@ def process(filename, hints):
             outfile.write(data)
 
 
-def main():
-    if exists('hints.json'):
-        hints = load(open('hints.json'))
+def main(folder):
+    hints_file = join(folder, 'hints.json')
+    if exists(hints_file):
+        hints = load(open(hints_file))
     else:
         hints = {}
-    for filename in sys.argv[1:]:
+    for filename in glob(join(folder, '*.qif')):
         process(filename, hints)
-        dump(hints, open('hints.json', 'w'), indent=4)
+        dump(hints, open(hints_file, 'w'), indent=4)
 
 
 if __name__ == '__main__':
