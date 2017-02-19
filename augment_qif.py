@@ -44,7 +44,7 @@ def process(filename, hints):
         else:
             guessed_account = ''
 
-        account_number = raw_input(
+        account_number = input(
             'Account Number [%s]: ' % guessed_account).strip()
 
         if not account_number and not guessed_account:
@@ -77,4 +77,8 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    if sys.version_info < (3, 0):
+        print("Python 3 required!", file=sys.stderr)
+        sys.exit(1)
+    else:
+        sys.exit(main(sys.argv[1]))
