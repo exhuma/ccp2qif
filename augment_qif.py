@@ -44,6 +44,9 @@ def process(filename, hints):
 
     if not has_account_identifier:
         for account_number, guesses in hints.items():
+            if not isinstance(guesses, list):
+                raise ValueError('Value for hint key %r should be a list!' %
+                                account_number)
             if any([guess.lower() in filename.lower() for guess in guesses]):
                 guessed_account = account_number
                 break
@@ -92,4 +95,8 @@ if __name__ == '__main__':
         print("Python 3 required!", file=sys.stderr)
         sys.exit(1)
     else:
-        sys.exit(main(sys.argv[1]))
+        try:
+            sys.exit(main(sys.argv[1]))
+        except Exception as exc:
+            print(str(exc), file=sys.stderr)
+            sys.exit(1)
