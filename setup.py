@@ -17,7 +17,8 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': {
-            'ccp2qif=ccp2qif.core:climain'
+            'ccp2qif=ccp2qif.core:climain',
+            'augment_qif=ccp2qif.qiftools.augment:main',
         }
     },
     classifiers=[

@@ -19,6 +19,7 @@ The QIF files and hints file must be in the same folder. All QIF files in that
 folder will be processed. The original file will be written as a '.bak' file.
 """
 
+from __future__ import print_function
 from glob import glob
 from json import load, dump
 from os.path import exists, basename, join
