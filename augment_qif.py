@@ -28,7 +28,7 @@ import sys
 
 
 
-def process(filename, hints):
+def process_file(filename, hints):
 
     print('Processing %s' % filename)
     with open(filename) as fp:
@@ -77,7 +77,7 @@ def process(filename, hints):
         print('%s already contains an account identfidier' % filename)
 
 
-def main(folder):
+def process_folder(folder):
     hints_file = join(folder, 'hints.json')
     if exists(hints_file):
         with open(hints_file) as fp:
@@ -85,18 +85,22 @@ def main(folder):
     else:
         hints = {}
     for filename in glob(join(folder, '*.qif')):
-        process(filename, hints)
+        process_file(filename, hints)
         with open(hints_file, 'w') as fp:
             dump(hints, fp, indent=4)
 
 
-if __name__ == '__main__':
+def main():
     if sys.version_info < (3, 0):
         print("Python 3 required!", file=sys.stderr)
         sys.exit(1)
     else:
         try:
-            sys.exit(main(sys.argv[1]))
+            sys.exit(process_folder(sys.argv[1]))
         except Exception as exc:
             print(str(exc), file=sys.stderr)
             sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
