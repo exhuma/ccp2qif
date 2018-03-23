@@ -12,8 +12,6 @@ from ccp2qif.util import UnicodeReader
 from ccp2qif.model import QIFTransaction, TransactionList, AccountInfo
 from ccp2qif.ccp import (
     try_getting_account_number,
-    convert_csv,
-    convert_excel,
 )
 
 def write_qif(transaction_list: TransactionList, outfile: TextIO,

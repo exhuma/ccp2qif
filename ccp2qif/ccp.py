@@ -1,5 +1,6 @@
 from collections import namedtuple
-from datetime import datetime
+from xlrd import open_workbook, xldate_as_tuple
+from datetime import datetime, date
 from decimal import Decimal
 import codecs
 import csv
@@ -60,7 +61,27 @@ def to_qif(record: DataRow) -> QIFTransaction:
     return output
 
 
-def parse(infile):
+def parse_xls(infile, account_number='unknown'):
+    account_info = AccountInfo(account_number, '')
+    book = open_workbook(infile)
+    sheet = book.sheet_by_index(0)
+    transactions = []
+    for row_index in range(1, sheet.nrows):
+        line = [sheet.cell(row_index, col_index).value
+                for col_index in range(sheet.ncols)]
+        acdate_value, description, cp_acct, cp_name, amount = line
+        acdate_value = date(*xldate_as_tuple(acdate_value, book.datemode)[:3])
+        transactions.append(QIFTransaction(
+            acdate_value,
+            Decimal('%.2f' % amount),
+            description,
+            cp_acct,
+            ''
+        ))
+    return TransactionList(account_info, transactions)
+
+
+def parse_csv(infile):
     raw_account_info = next(infile)
     _, account_number, _ = raw_account_info.split(';')
     next(infile)  # column names
@@ -76,69 +97,3 @@ def parse(infile):
             row[9]  # reference
         ))
     return TransactionList(account_info, transactions)
-
-
-def convert_csv(source_filename, target_filename, account_name=None):
-    with open(source_filename, 'r') as csvfile:
-        with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
-
-            # If the file contains a line with account info, this overrides the
-            # rest.
-            account_line = csvfile.readline()
-            account_number = try_getting_account_number(account_line)
-            if account_number:
-                print('Account number %r found in file. Overriding manual '
-                      'value' % account_number)
-                account_name = account_number
-
-            if account_name:
-                outfile.write('!Account\n')
-                outfile.write('N{0}\n'.format(account_name))
-                outfile.write('TBank\n')
-                outfile.write('^\n')
-            outfile.write(u'!Type:Bank\n')
-
-            csvfile.readline()  # skip header
-            csvreader = UnicodeReader(csvfile, delimiter=';', quotechar='"',
-                                      encoding='latin1')
-            for row in csvreader:
-                record = DataRow(*row)
-                outfile.write(to_qif(record._asdict()))
-                print(u'Wrote {0.accounting_date} - {0.communication_1}'.format(
-                    record).encode('utf8'))
-
-
-def convert_excel(source_filename, target_filename, account_name):
-    from xlrd import open_workbook, xldate_as_tuple
-    from datetime import date
-    if not account_name:
-        raise ValueError('Account name is required for Excel exports!')
-    book = open_workbook(source_filename)
-    sheet = book.sheet_by_index(0)
-    with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
-        outfile.write('!Account\n')
-        outfile.write('N{0}\n'.format(account_name))
-        outfile.write('TBank\n')
-        outfile.write('^\n')
-        outfile.write(u'!Type:Bank\n')
-        for row_index in range(1, sheet.nrows):
-            line = [sheet.cell(row_index, col_index).value
-                    for col_index in range(sheet.ncols)]
-            acdate_value, opdate_value, card_number, description, _, amount = line
-            opdate_value = date(*xldate_as_tuple(opdate_value, book.datemode)[:3])
-            acdate_value = date(*xldate_as_tuple(acdate_value, book.datemode)[:3])
-            record = DataRow(
-                acdate_value,
-                description,
-                amount,
-                'EUR',
-                opdate_value,
-                'unspecified',
-                '',
-                '',
-                '',
-                '',
-            )
-            outfile.write(to_qif(record._asdict()))
-            print(u'Wrote {0.value_date} - {0.description}'.format(
-                record).encode('utf8'))

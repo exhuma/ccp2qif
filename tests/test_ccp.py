@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from io import StringIO
 
-from ccp2qif.ccp import parse
+from ccp2qif.ccp import parse_csv, parse_xls
 from ccp2qif.core import (
     AccountInfo,
     QIFTransaction as QT,
@@ -11,7 +11,7 @@ from ccp2qif.core import (
 )
 
 
-def test_parsing():
+def test_parsing_csv():
     cp_account = 'LU23 4567 8901 2345 1234'
     expected = TransactionList(
         account=AccountInfo('LU12 3456 7890 1234 5678', ''),
@@ -30,7 +30,27 @@ def test_parsing():
     )
 
     with open('testdata/ccp/ccp_in.csv') as infile:
-        result = parse(infile)
+        result = parse_csv(infile)
+    assert result.account == expected.account
+    assert result.transactions == expected.transactions
+    assert result == expected
+
+
+def test_parsing_xls():
+    expected = TransactionList(
+        account=AccountInfo('foo', ''),
+        transactions=[
+            QT(date(2018, 3, 23), Decimal('-18.90'), 'Desc 1', 'LU12 2345 1111 2222 0001', ''),
+            QT(date(2018, 3, 23), Decimal('-2.90'), 'Desc 2', 'LU12 2345 1111 2222 0002', ''),
+            QT(date(2018, 3, 21), Decimal('200.00'), 'Desc 3', 'LU12 2345 1111 2222 0003', ''),
+            QT(date(2018, 3, 21), Decimal('-11.40'), 'Desc 4', 'LU12 2345 1111 2222 0004', ''),
+            QT(date(2018, 3, 21), Decimal('-19.20'), 'Desc 5', 'LU12 2345 1111 2222 0005', ''),
+            QT(date(2018, 3, 20), Decimal('-2.90'), 'Desc 6', 'LU12 2345 1111 2222 0006', ''),
+        ]
+    )
+
+
+    result = parse_xls('testdata/ccp/ccp_in.xlsx', 'foo')
     assert result.account == expected.account
     assert result.transactions == expected.transactions
     assert result == expected
@@ -38,7 +58,7 @@ def test_parsing():
 
 def test_to_qif():
     with open('testdata/ccp/ccp_in.csv') as infile:
-        input_data = parse(infile)
+        input_data = parse_csv(infile)
     with open('testdata/ccp/ccp_out.qif') as infile:
         expected = infile.read()
     output = StringIO()
