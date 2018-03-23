@@ -1,9 +1,12 @@
 from collections import namedtuple
+from datetime import datetime
+from decimal import Decimal
 import codecs
+import csv
 
 from schwifty import IBAN
 
-from ccp2qif.model import QIFTransaction
+from ccp2qif.model import QIFTransaction, AccountInfo, TransactionList
 from ccp2qif.util import UnicodeReader, account_name_from_filename
 
 
@@ -43,39 +46,40 @@ def clean_join(record, fields):
 
 
 def to_qif(record: DataRow) -> QIFTransaction:
-    message = clean_join(record,
+    message = clean_join(record._asdict(),
                          ('communication_1', 'communication_2', 'description'))
     counterparty = clean_join(record,
                               ('counterparty_name', 'counterparty_account'))
-    lines = []
-    lines.append(u'D{value_date}')
-    lines.append(u'T{amount}')
-    if record['operation_reference']:
-        lines.append(u'N{operation_reference}')
-    lines.append(u'M{message_}')
-    if counterparty:
-        lines.append(u'P{counterparty_}')
-    lines.append(u'^')
+    output = QIFTransaction(
+        record.value_date,
+        record.amount,
+        message,
+        counterparty
+    )
+    # TODO if record['operation_reference']:
+    # TODO     lines.append(u'N{operation_reference}')
+    return output
 
-    outlines = []
-    for line in lines:
-        outlines.append(line.format(
-            message_=message, counterparty_=counterparty, **record))
-    return '\n'.join(outlines)
+
+def parse(infile):
+    raw_account_info = next(infile)
+    _, account_number, _ = raw_account_info.split(';')
+    next(infile)  # column names
+    reader = csv.reader(infile, delimiter=';', quotechar='"')
+    account_info = AccountInfo(account_number, '')
+    transactions = []
+    for row in reader:
+        transactions.append(QIFTransaction(
+            datetime.strptime(row[4], '%d-%m-%Y').date(),
+            Decimal(row[2].replace(',', '.')),
+            '%s | %s | %s' % (row[1], row[7], row[8]),
+            row[5],
+        ))
+        # TODO row[9]  # reference
+    return TransactionList(account_info, transactions)
 
 
 def convert_csv(source_filename, target_filename, account_name=None):
-    detected_account_name = account_name_from_filename(source_filename)
-    if not account_name and detected_account_name:
-        print('Using %s as account number (from filename): ' %
-              detected_account_name)
-        account_name = detected_account_name
-    elif account_name:
-        print('Using %s as account number (from CLI argument): ' %
-              account_name)
-    else:
-        print('No account number manually specified')
-
     with open(source_filename, 'r') as csvfile:
         with codecs.open(target_filename, 'w', encoding='utf8') as outfile:
 

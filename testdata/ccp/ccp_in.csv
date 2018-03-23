@@ -1,0 +1,7 @@
+Account number :;LU12 3456 7890 1234 5678;
+Accounting date;Description;Operation amount;Currency;Value date;Counterparty account;Counterparty name :;Communication 1 :;Communication 2 :;Operation reference
+02-01-2017;description 1;-16,70;EUR;02-01-2017;LU23 4567 8901 2345 1234;cp 1;comm 1-1;comm 1-2;ref 1
+02-01-2017;description 2;20,10;EUR;02-01-2017;LU23 4567 8901 2345 1234;cp 2;comm 2-1;comm 2-2;ref 2
+03-01-2017;description 3;-20,00;EUR;03-01-2017;LU23 4567 8901 2345 1234;cp 3;comm 3-1;comm 3-2;ref 3
+04-01-2017;description 4;-20,00;EUR;04-01-2017;LU23 4567 8901 2345 1234;cp 4;comm 4-1;comm 4-2;ref 4
+05-01-2017;description 5;500;EUR;05-01-2017;LU23 4567 8901 2345 1234;cp 5;comm 5-1;comm 5-2;ref 5
