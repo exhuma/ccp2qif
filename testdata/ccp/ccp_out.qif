@@ -1,8 +1,9 @@
-!Type:Bank
 !Account
 NLU12 3456 7890 1234 5678
 D""
+TBank
 ^
+!Type:Bank
 D02/01/2017
 T-16.70
 Mdescription 1 | comm 1-1 | comm 1-2

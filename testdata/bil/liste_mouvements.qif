@@ -1,8 +1,9 @@
-!Type:Bank
 !Account
 NLU123456789012345678
 D"This is the account description"
+TBank
 ^
+!Type:Bank
 D09/03/2018
 T-54.42
 Mlabel 1 | communication 1

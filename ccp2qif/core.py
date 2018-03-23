@@ -22,11 +22,12 @@ def write_qif(transaction_list: TransactionList, outfile: TextIO,
     Converts a transaction list to a QIF file
     '''
     write = partial(print, file=outfile)
-    write('!Type:Bank')
     write('!Account')
     write('N%s' % transaction_list.account.account_number)
     write('D"%s"' % transaction_list.account.description)
+    write('TBank')
     write('^')
+    write('!Type:Bank')
     for transaction in transaction_list.transactions:
         write('D%s' % transaction.date.strftime(datefmt))
         write('T%s' % transaction.value)
