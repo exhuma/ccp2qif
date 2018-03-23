@@ -1,5 +1,8 @@
+from os.path import basename
 import codecs
 import csv
+
+from schwifty import IBAN
 
 
 class UTF8Recoder:
@@ -32,3 +35,15 @@ class UnicodeReader:
 
     def __iter__(self):
         return self
+
+
+def account_name_from_filename(filename: str) -> str:
+    # if the filename is a valid IBAN number, we take this as account number
+    base_name, _, _ = basename(filename).rpartition('.')
+    try:
+        iban = IBAN(base_name)
+    except ValueError:
+        # not a valid IBAN number. We can ignore this.
+        return None
+    else:
+        return iban.formatted
