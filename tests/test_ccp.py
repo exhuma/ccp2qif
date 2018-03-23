@@ -64,5 +64,4 @@ def test_to_qif():
     output = StringIO()
     write_qif(input_data, output)
     result = output.getvalue()
-    print(result)
     assert result == expected

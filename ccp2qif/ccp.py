@@ -2,13 +2,11 @@ from collections import namedtuple
 from xlrd import open_workbook, xldate_as_tuple
 from datetime import datetime, date
 from decimal import Decimal
-import codecs
 import csv
 
 from schwifty import IBAN
 
 from ccp2qif.model import QIFTransaction, AccountInfo, TransactionList
-from ccp2qif.util import UnicodeReader, account_name_from_filename
 
 
 DataRow = namedtuple(
