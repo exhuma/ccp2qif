@@ -49,32 +49,26 @@ def convert(source_filename, target_filename, account_name=None):
 
 
 def climain():
-    from optparse import OptionParser
-    parser = OptionParser(usage="%prog [options] <infile>")
-    parser.add_option('-n', '--account-name', dest='account_name',
-                      help='The name of the account for this import',
-                      default=None)
-    parser.add_option('-o', '--outfile', dest='outfile',
-                      help='The output file.', default=None)
-    (options, args) = parser.parse_args()
+    from argparse import ArgumentParser
+    parser = ArgumentParser(usage="%prog [options] <infile>")
+    parser.add_argument('-n', '--account-name', dest='account_name',
+                        help='The name of the account for this import',
+                        default=None)
+    parser.add_argument('-o', '--outfile', dest='outfile',
+                        help='The output file.', default=None)
+    parser.add_argument('infile', nargs=1)
+    args = parser.parse_args()
 
-    if not args:
-        print('Requirement argument <infile> not specified!',
-              file=sys.stderr)
-        parser.print_usage(sys.stderr)
-        return 9
-
-    infile = args[0]
-    if options.outfile:
-        outfile = options.outfile
+    if args.outfile:
+        outfile = args.outfile
     else:
-        base, ext = splitext(infile)
+        base, ext = splitext(args.infile[0])
         if ext.lower() == 'qif':
             print('Error: The input file seems to be a qif file already!',
                   file=sys.stderr)
             return 9
         outfile = '{0}.qif'.format(base)
 
-    convert(infile,
+    convert(args.infile[0],
             outfile,
-            account_name=options.account_name)
+            account_name=args.account_name)
