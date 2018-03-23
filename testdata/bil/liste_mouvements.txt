@@ -1,0 +1,12 @@
+BILnet
+LISTE DES MOUVEMENTS DU COMPTE
+LU123456789012345678 "This is the account description"
+
+Date;Date valeur;Libellé;Communication;Montant (EUR);
+09/03/2018;09/03/2018;label 1;communication 1;-54.42;
+08/03/2018;08/03/2018;label 2;communication 2;-1000.00;
+05/03/2018;05/03/2018;label 3;communication 3;-56.00;
+05/03/2018;05/03/2018;label 4;communication 4;-16.00;
+01/03/2018;05/03/2018;label 5;communication 5;24.51;
+05/03/2018;03/03/2018;label 6;communication 6;-90.00;
+23/01/2018;23/01/2018;label 7;communication 7;-300.00;

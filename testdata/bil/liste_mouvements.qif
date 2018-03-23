@@ -1,0 +1,33 @@
+!Type:Bank
+!Account
+NLU123456789012345678
+D"This is the account description"
+^
+D09/03/2018
+T-54.42
+Mlabel 1 | communication 1
+^
+D08/03/2018
+T-1000.00
+Mlabel 2 | communication 2
+^
+D05/03/2018
+T-56.00
+Mlabel 3 | communication 3
+^
+D05/03/2018
+T-16.00
+Mlabel 4 | communication 4
+^
+D05/03/2018
+T24.51
+Mlabel 5 | communication 5
+^
+D03/03/2018
+T-90.00
+Mlabel 6 | communication 6
+^
+D23/01/2018
+T-300.00
+Mlabel 7 | communication 7
+^

@@ -1,8 +1,10 @@
 from __future__ import print_function
 from collections import namedtuple
+from functools import partial
+from os.path import splitext, basename
+from typing import TextIO
 import codecs
 import sys
-from os.path import splitext, basename
 
 from schwifty import IBAN
 
@@ -20,6 +22,35 @@ DataRow = namedtuple(
     'communication_1, '
     'communication_2, '
     'operation_reference')
+
+
+TransactionList = namedtuple('TransactionList', 'account transactions')
+AccountInfo = namedtuple('AccountInfo', ['account_number', 'description'])
+
+QIFTransaction = namedtuple(
+    'QIFTransaction', [
+        'date',
+        'value',
+        'message'
+    ])
+
+
+def write_qif(transaction_list: TransactionList, outfile: TextIO,
+              datefmt: str = '%d/%m/%Y'):
+    '''
+    Converts a transaction list to a QIF file
+    '''
+    write = partial(print, file=outfile)
+    write('!Type:Bank')
+    write('!Account')
+    write('N%s' % transaction_list.account.account_number)
+    write('D"%s"' % transaction_list.account.description)
+    write('^')
+    for transaction in transaction_list.transactions:
+        write('D%s' % transaction.date.strftime(datefmt))
+        write('T%s' % transaction.value)
+        write('M%s' % transaction.message)
+        write('^')
 
 
 def clean_join(record, fields):
