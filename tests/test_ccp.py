@@ -17,15 +17,15 @@ def test_parsing():
         account=AccountInfo('LU12 3456 7890 1234 5678', ''),
         transactions=[
             QT(date(2017, 1, 2), Decimal('-16.70'),
-               'description 1 | comm 1-1 | comm 1-2', cp_account),
+               'description 1 | comm 1-1 | comm 1-2', cp_account, 'ref 1'),
             QT(date(2017, 1, 2), Decimal('20.10'),
-               'description 2 | comm 2-1 | comm 2-2', cp_account),
+               'description 2 | comm 2-1 | comm 2-2', cp_account, 'ref 2'),
             QT(date(2017, 1, 3), Decimal('-20.00'),
-               'description 3 | comm 3-1 | comm 3-2', cp_account),
+               'description 3 | comm 3-1 | comm 3-2', cp_account, 'ref 3'),
             QT(date(2017, 1, 4), Decimal('-20.00'),
-               'description 4 | comm 4-1 | comm 4-2', cp_account),
+               'description 4 | comm 4-1 | comm 4-2', cp_account, 'ref 4'),
             QT(date(2017, 1, 5), Decimal('500'),
-               'description 5 | comm 5-1 | comm 5-2', cp_account),
+               'description 5 | comm 5-1 | comm 5-2', cp_account, 'ref 5'),
         ]
     )
 

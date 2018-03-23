@@ -9,4 +9,5 @@ QIFTransaction = namedtuple(
         'value',
         'message',
         'counterparty',
+        'reference',
     ])

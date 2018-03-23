@@ -54,10 +54,9 @@ def to_qif(record: DataRow) -> QIFTransaction:
         record.value_date,
         record.amount,
         message,
-        counterparty
+        counterparty,
+        record.operation_reference
     )
-    # TODO if record['operation_reference']:
-    # TODO     lines.append(u'N{operation_reference}')
     return output
 
 
@@ -74,8 +73,8 @@ def parse(infile):
             Decimal(row[2].replace(',', '.')),
             '%s | %s | %s' % (row[1], row[7], row[8]),
             row[5],
+            row[9]  # reference
         ))
-        # TODO row[9]  # reference
     return TransactionList(account_info, transactions)
 
 

@@ -31,10 +31,10 @@ def write_qif(transaction_list: TransactionList, outfile: TextIO,
         write('D%s' % transaction.date.strftime(datefmt))
         write('T%s' % transaction.value)
         write('M%s' % transaction.message)
-        # TODO if transaction.operation_reference:
-        # TODO     write('N%s' % transaction.operation_reference)
         if transaction.counterparty:
             write('P%s' % transaction.counterparty)
+        if transaction.reference:
+            write('N%s' % transaction.reference)
         write('^')
 
 
