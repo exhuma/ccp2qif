@@ -3,6 +3,7 @@ import codecs
 
 from schwifty import IBAN
 
+from ccp2qif.model import QIFTransaction
 from ccp2qif.util import UnicodeReader, account_name_from_filename
 
 
@@ -41,7 +42,7 @@ def clean_join(record, fields):
     return '; '.join([record[_] for _ in fields if record[_].strip()])
 
 
-def to_qif(record):
+def to_qif(record: DataRow) -> QIFTransaction:
     message = clean_join(record,
                          ('communication_1', 'communication_2', 'description'))
     counterparty = clean_join(record,

@@ -16,13 +16,13 @@ def test_parsing():
         account=AccountInfo('LU123456789012345678',
                             'This is the account description'),
         transactions=[
-            QT(date(2018, 3, 9), Decimal('-54.42'), 'label 1 | communication 1'),
-            QT(date(2018, 3, 8), Decimal('-1000.00'), 'label 2 | communication 2'),
-            QT(date(2018, 3, 5), Decimal('-56.00'), 'label 3 | communication 3'),
-            QT(date(2018, 3, 5), Decimal('-16.00'), 'label 4 | communication 4'),
-            QT(date(2018, 3, 5), Decimal('24.51'), 'label 5 | communication 5'),
-            QT(date(2018, 3, 3), Decimal('-90.00'), 'label 6 | communication 6'),
-            QT(date(2018, 1, 23), Decimal('-300.00'), 'label 7 | communication 7'),
+            QT(date(2018, 3, 9), Decimal('-54.42'), 'label 1 | communication 1', ''),
+            QT(date(2018, 3, 8), Decimal('-1000.00'), 'label 2 | communication 2', ''),
+            QT(date(2018, 3, 5), Decimal('-56.00'), 'label 3 | communication 3', ''),
+            QT(date(2018, 3, 5), Decimal('-16.00'), 'label 4 | communication 4', ''),
+            QT(date(2018, 3, 5), Decimal('24.51'), 'label 5 | communication 5', ''),
+            QT(date(2018, 3, 3), Decimal('-90.00'), 'label 6 | communication 6', ''),
+            QT(date(2018, 1, 23), Decimal('-300.00'), 'label 7 | communication 7', ''),
         ]
     )
     with open('testdata/bil/liste_mouvements.txt') as infile:

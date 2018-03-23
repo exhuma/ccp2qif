@@ -29,6 +29,6 @@ def parse(file_pointer):
         message = '%s | %s' % (label, message)
         date = datetime.strptime(value_date, '%d/%m/%Y').date()
         value = Decimal(value)
-        transactions.append(QIFTransaction(date, value, message))
+        transactions.append(QIFTransaction(date, value, message, ''))
 
     return TransactionList(account_info, transactions)

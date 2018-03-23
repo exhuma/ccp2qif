@@ -9,22 +9,12 @@ import sys
 from schwifty import IBAN
 
 from ccp2qif.util import UnicodeReader
+from ccp2qif.model import QIFTransaction, TransactionList, AccountInfo
 from ccp2qif.ccp import (
     try_getting_account_number,
     convert_csv,
     convert_excel,
 )
-
-TransactionList = namedtuple('TransactionList', 'account transactions')
-AccountInfo = namedtuple('AccountInfo', ['account_number', 'description'])
-
-QIFTransaction = namedtuple(
-    'QIFTransaction', [
-        'date',
-        'value',
-        'message'
-    ])
-
 
 def write_qif(transaction_list: TransactionList, outfile: TextIO,
               datefmt: str = '%d/%m/%Y'):
