@@ -10,9 +10,9 @@ from schwifty import IBAN
 
 from ccp2qif.util import UnicodeReader
 from ccp2qif.model import QIFTransaction, TransactionList, AccountInfo
-from ccp2qif.ccp import (
-    try_getting_account_number,
-)
+import ccp2qif.bil
+import ccp2qif.ccp
+
 
 def write_qif(transaction_list: TransactionList, outfile: TextIO,
               datefmt: str = '%d/%m/%Y'):
@@ -39,18 +39,28 @@ def write_qif(transaction_list: TransactionList, outfile: TextIO,
 
 def convert(source_filename, target_filename, account_name=None):
     _, _, extension = source_filename.lower().rpartition('.')
-    if extension == 'xls':
-        func = convert_excel
-    elif extension == 'csv':
-        func = convert_csv
-    else:
-        raise ValueError('Unsupported file format: %r' % extension)
-    func(source_filename, target_filename, account_name)
+
+    parser = None
+    for mod in (ccp2qif.bil, ccp2qif.ccp):
+        with open(source_filename) as infile:
+            parser = mod.sniff(infile)
+        if parser:
+            break
+
+    if not parser:
+        raise ValueError('No valid parser found')
+
+    with open(source_filename) as infile:
+        data = parser(infile, account_name)
+
+    with open(target_filename, 'w') as out:
+        write_qif(data, out)
+        print('Written to %r' % target_filename)
 
 
 def climain():
     from argparse import ArgumentParser
-    parser = ArgumentParser(usage="%prog [options] <infile>")
+    parser = ArgumentParser()
     parser.add_argument('-n', '--account-name', dest='account_name',
                         help='The name of the account for this import',
                         default=None)

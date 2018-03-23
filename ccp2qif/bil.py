@@ -4,14 +4,16 @@ from datetime import datetime
 from ccp2qif.core import AccountInfo, QIFTransaction, TransactionList
 
 
-def parse(file_pointer):
-    '''
-    '''
+def sniff(file_pointer):
     file_pointer.seek(0)
     magic = file_pointer.read(6)
-    if magic != 'BILnet':
-        raise ValueError('Unsupported file!')
-    file_pointer.seek(0)  # reset (to make sure "next()" works as expected)
+    file_pointer.seek(0)
+    if magic == 'BILnet':
+        return parse
+    return None
+
+
+def parse(file_pointer, account_number=''):
     next(file_pointer)  # magic marker
     next(file_pointer)  # redundant heading
     raw_account_info = next(file_pointer).strip()

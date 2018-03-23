@@ -23,6 +23,15 @@ DataRow = namedtuple(
     'operation_reference')
 
 
+def sniff(file_pointer):
+    file_pointer.seek(0)
+    magic = file_pointer.read(17)
+    file_pointer.seek(0)
+    if magic == 'Account number :;':
+        return parse_csv
+    return None
+
+
 def try_getting_account_number(line: str) -> str:
     if line.lower().startswith('account number'):
         account_info = line.split(';')
@@ -79,7 +88,7 @@ def parse_xls(infile, account_number='unknown'):
     return TransactionList(account_info, transactions)
 
 
-def parse_csv(infile):
+def parse_csv(infile, account_number=''):
     raw_account_info = next(infile)
     _, account_number, _ = raw_account_info.split(';')
     next(infile)  # column names
