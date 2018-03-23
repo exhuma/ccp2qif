@@ -4,14 +4,19 @@ from functools import partial
 from os.path import splitext
 from typing import TextIO
 import codecs
+import logging
 import sys
 
+from gouge.colourcli import Simple
 from schwifty import IBAN
 
 from ccp2qif.util import UnicodeReader
 from ccp2qif.model import QIFTransaction, TransactionList, AccountInfo
 import ccp2qif.bil
 import ccp2qif.ccp
+
+
+LOG = logging.getLogger(__name__)
 
 
 def write_qif(transaction_list: TransactionList, outfile: TextIO,
@@ -27,6 +32,8 @@ def write_qif(transaction_list: TransactionList, outfile: TextIO,
     write('^')
     write('!Type:Bank')
     for transaction in transaction_list.transactions:
+        LOG.debug('Writing transaction at %s to %r',
+                  transaction.date, outfile.name)
         write('D%s' % transaction.date.strftime(datefmt))
         write('T%s' % transaction.value)
         write('M%s' % transaction.message)
@@ -42,11 +49,13 @@ def convert(source_filename, target_filename, account_name=None):
 
     parser = None
     for mod in (ccp2qif.bil, ccp2qif.ccp):
+        LOG.debug('Probing %r with %r', source_filename, mod)
         with open(source_filename) as infile:
             parser = mod.sniff(infile)
         if parser:
             break
 
+    LOG.debug('Selected parser: %s:%s', parser.__module__, parser.__name__)
     if not parser:
         raise ValueError('No valid parser found')
 
@@ -55,7 +64,11 @@ def convert(source_filename, target_filename, account_name=None):
 
     with open(target_filename, 'w') as out:
         write_qif(data, out)
-        print('Written to %r' % target_filename)
+        LOG.info('Written to %r' % target_filename)
+
+
+def setup_logging(args):
+    Simple.basicConfig(level=logging.DEBUG)
 
 
 def climain():
@@ -68,6 +81,7 @@ def climain():
                         help='The output file.', default=None)
     parser.add_argument('infile', nargs=1)
     args = parser.parse_args()
+    setup_logging(args)
 
     if args.outfile:
         outfile = args.outfile

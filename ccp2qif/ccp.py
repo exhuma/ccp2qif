@@ -1,7 +1,7 @@
 from collections import namedtuple
-from xlrd import open_workbook, xldate_as_tuple
 from datetime import datetime, date
 from decimal import Decimal
+from xlrd import open_workbook, xldate_as_tuple
 import csv
 
 from schwifty import IBAN
