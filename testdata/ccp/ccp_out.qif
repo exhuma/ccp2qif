@@ -1,0 +1,36 @@
+!Account
+NLU12 3456 7890 1234 5678
+D""
+TBank
+^
+!Type:Bank
+D02/01/2017
+T-16.70
+Mdescription 1 | comm 1-1 | comm 1-2
+PLU23 4567 8901 2345 1234
+Nref 1
+^
+D02/01/2017
+T20.10
+Mdescription 2 | comm 2-1 | comm 2-2
+PLU23 4567 8901 2345 1234
+Nref 2
+^
+D03/01/2017
+T-20.00
+Mdescription 3 | comm 3-1 | comm 3-2
+PLU23 4567 8901 2345 1234
+Nref 3
+^
+D04/01/2017
+T-20.00
+Mdescription 4 | comm 4-1 | comm 4-2
+PLU23 4567 8901 2345 1234
+Nref 4
+^
+D05/01/2017
+T500
+Mdescription 5 | comm 5-1 | comm 5-2
+PLU23 4567 8901 2345 1234
+Nref 5
+^

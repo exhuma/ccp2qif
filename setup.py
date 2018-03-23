@@ -11,6 +11,7 @@ setup(
     url='http://github.com/exhuma/ccp2qif',
     license='MIT',
     install_requires=[
+        'gouge',
         'schwifty',
         'xlrd',
     ],
