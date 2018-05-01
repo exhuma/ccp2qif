@@ -51,9 +51,17 @@ def convert(source_filename, target_filename, account_name=None):
     for mod in (ccp2qif.bil, ccp2qif.ccp):
         LOG.debug('Probing %r with %r', source_filename, mod)
         with open(source_filename) as infile:
-            parser = mod.sniff(infile)
+            try:
+                parser = mod.sniff(infile)
+            except Exception:
+                LOG.debug('Module %r was unable to process %r',
+                          mod, source_filename, exc_info=True)
+                continue
         if parser:
             break
+
+    if not parser:
+        raise ValueError('No parser found for %r' % source_filename)
 
     LOG.debug('Selected parser: %s:%s', parser.__module__, parser.__name__)
     if not parser:
