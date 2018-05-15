@@ -70,7 +70,7 @@ def convert(source_filename, target_filename, account_name=None):
     with open(source_filename, encoding='cp1252') as infile:
         data = parser(infile, account_name)
 
-    with open(target_filename, 'w') as out:
+    with open(target_filename, 'w', encoding='cp1252') as out:
         write_qif(data, out)
         LOG.info('Written to %r' % target_filename)
 
