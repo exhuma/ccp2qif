@@ -145,9 +145,9 @@ def parse_csv(infile, account_number=''):
     for row in reader:
         transactions.append(QIFTransaction(
             datetime.strptime(row[4], '%d-%m-%Y').date(),
-            Decimal(row[2].replace(',', '.')),
+            Decimal(row[2].replace('.', '').replace(',', '.')),
             '%s | %s | %s' % (row[1], row[7], row[8]),
-            row[5],
+            ' | '.join(row[5:7]),
             row[9]  # reference
         ))
     return TransactionList(account_info, transactions)
