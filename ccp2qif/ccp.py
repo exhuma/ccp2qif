@@ -1,3 +1,4 @@
+import logging
 from collections import namedtuple
 from datetime import datetime, date
 from decimal import Decimal
@@ -7,6 +8,9 @@ import csv
 from schwifty import IBAN
 
 from ccp2qif.model import QIFTransaction, AccountInfo, TransactionList
+
+
+LOG = logging.getLogger(__name__)
 
 
 DataRow = namedtuple(
@@ -28,6 +32,7 @@ def sniff(file_pointer):
     try:
         magic = file_pointer.read(17)
     except:
+        LOG.warning('Unable to read from file!', exc_info=True)
         magic = None
     file_pointer.seek(0)
     if magic == 'Account number :;':
