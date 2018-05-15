@@ -50,7 +50,7 @@ def convert(source_filename, target_filename, account_name=None):
     parser = None
     for mod in (ccp2qif.bil, ccp2qif.ccp):
         LOG.debug('Probing %r with %r', source_filename, mod)
-        with open(source_filename) as infile:
+        with open(source_filename, encoding='cp1252') as infile:
             try:
                 parser = mod.sniff(infile)
             except Exception:
@@ -67,7 +67,7 @@ def convert(source_filename, target_filename, account_name=None):
     if not parser:
         raise ValueError('No valid parser found')
 
-    with open(source_filename) as infile:
+    with open(source_filename, encoding='cp1252') as infile:
         data = parser(infile, account_name)
 
     with open(target_filename, 'w') as out:
