@@ -143,11 +143,22 @@ def parse_csv(infile, account_number=''):
     account_info = AccountInfo(account_number, '')
     transactions = []
     for row in reader:
+        desc = row[1].strip()
+        comm1 = row[7].strip()
+        comm2 = row[8].strip()
+        cp_acct = row[5].strip()
+        cp_name = row[6].strip()
+        reference = row[9]
+
+        message_fields = [desc, comm1, comm2]
+        cp_fields = [cp_acct, cp_name]
+        message = ' | '.join([fld for fld in message_fields if fld])
+        counterparty = ' | '.join([fld for fld in cp_fields if fld])
         transactions.append(QIFTransaction(
             datetime.strptime(row[4], '%d-%m-%Y').date(),
             Decimal(row[2].replace('.', '').replace(',', '.')),
-            '%s | %s | %s' % (row[1], row[7], row[8]),
-            ' | '.join(row[5:7]),
-            row[9]  # reference
+            message,
+            counterparty,
+            reference
         ))
     return TransactionList(account_info, transactions)
