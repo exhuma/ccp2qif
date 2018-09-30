@@ -1,12 +1,21 @@
 import csv
-from decimal import Decimal
+import logging
 from datetime import datetime
+from decimal import Decimal
+
 from ccp2qif.core import AccountInfo, QIFTransaction, TransactionList
+
+LOG = logging.getLogger(__name__)
 
 
 def sniff(file_pointer):
+    LOG.debug('Trying to detect file-type using %s', __name__)
     file_pointer.seek(0)
-    magic = file_pointer.read(6)
+    try:
+        magic = file_pointer.read(6)
+    except Exception as exc:
+        LOG.debug('Unable to read from file (%s)!', exc)
+        magic = None
     file_pointer.seek(0)
     if magic == 'BILnet':
         return parse

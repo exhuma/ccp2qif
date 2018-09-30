@@ -28,11 +28,12 @@ DataRow = namedtuple(
 
 
 def sniff(file_pointer):
+    LOG.debug('Trying to detect file-type using %s', __name__)
     file_pointer.seek(0)
     try:
         magic = file_pointer.read(17)
-    except:
-        LOG.warning('Unable to read from file!', exc_info=True)
+    except Exception as exc:
+        LOG.debug('Unable to read from file (%s)!', exc)
         magic = None
     file_pointer.seek(0)
     if magic == 'Account number :;':
