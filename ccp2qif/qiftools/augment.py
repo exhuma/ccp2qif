@@ -46,7 +46,7 @@ def process_file(filename, hints):
         for account_number, guesses in hints.items():
             if not isinstance(guesses, list):
                 raise ValueError('Value for hint key %r should be a list!' %
-                                account_number)
+                                 account_number)
             if any([guess.lower() in filename.lower() for guess in guesses]):
                 guessed_account = account_number
                 break
