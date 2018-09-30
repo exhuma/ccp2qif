@@ -20,13 +20,12 @@ folder will be processed. The original file will be written as a '.bak' file.
 """
 
 from __future__ import print_function
-from glob import glob
-from json import load, dump
-from os.path import exists, basename, join
-from shutil import move
+
 import sys
-
-
+from glob import glob
+from json import dump, load
+from os.path import basename, exists, join
+from shutil import move
 
 
 def process_file(filename, hints):
@@ -94,14 +93,17 @@ def process_folder(folder):
 def main():
     if sys.version_info < (3, 0):
         print("Python 3 required!", file=sys.stderr)
-        sys.exit(1)
+        return 1
     else:
+        dirname = sys.argv[1]
+
         try:
-            sys.exit(process_folder(sys.argv[1]))
+            process_folder(dirname)
+            return 0
         except Exception as exc:
             print(str(exc), file=sys.stderr)
-            sys.exit(1)
+            return 1
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
