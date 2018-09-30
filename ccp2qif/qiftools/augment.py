@@ -24,7 +24,7 @@ from __future__ import print_function
 import sys
 from glob import glob
 from json import dump, load
-from os.path import basename, exists, join
+from os.path import basename, exists, isdir, join
 from shutil import move
 
 
@@ -96,6 +96,9 @@ def main():
         return 1
     else:
         dirname = sys.argv[1]
+        if not isdir(dirname):
+            print('%s should be a folder!' % dirname, file=sys.stderr)
+            return 1
 
         try:
             process_folder(dirname)
